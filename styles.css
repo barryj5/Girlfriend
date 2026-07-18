@@ -128,10 +128,27 @@
   column-count: 4;
   column-gap: 10px;
   padding: 10px;
-}
+} 
 .imageGrid img {
   width: 100%;
   margin-bottom: 10px;
   border-radius: 10px;
   display: block;
+}
+
+.ImageDiv {
+  position: relative;
+  break-inside: avoid;
+}
+.ImageDiv .heart{
+  display: none;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+.saved{
+  color: red;
+}
+.ImageDiv:hover i{
+  display: inline-block;
 }
