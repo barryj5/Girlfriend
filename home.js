@@ -2,6 +2,7 @@ const imageInput = document.getElementById("imageUpload")
 const AddButton = document.getElementById("AddButton")
 const MainSection = document.querySelector(".imageGrid")
 const SavedPage = document.getElementById("SavedPage")
+const searchInput = document.querySelector(".homeInput")
 
 let savedImage = JSON.parse(localStorage.getItem("Items"))||[];
 
@@ -53,8 +54,12 @@ imageInput.addEventListener("change",function(){
     img.src = e.target.result
     MainSection.appendChild(div)
 
+    let captionText = prompt("Add a caption for this image:") 
+    if(captionText === null){
+      captionText = "Untitled"
+    }
 
-    const newImage = {id: Date.now(), src: e.target.result}
+    const newImage = {id: Date.now(), src: e.target.result, caption: captionText}
     File.push(newImage)
 
     i.onclick = function(){
@@ -70,4 +75,22 @@ imageInput.addEventListener("change",function(){
   }
   reader.readAsDataURL(file)
 
+})
+searchInput.addEventListener("keydown",function(e){
+  if(e.key === "Enter"){
+    const inputted = searchInput.value.toLowerCase();
+    const filteredImages = File.filter(image => image.caption && image.caption.toLowerCase().includes(inputted))
+    MainSection.innerHTML = ""
+    for(let filt in filteredImages){
+      let Image = document.createElement("img")
+      let Dive = document.createElement("div")
+      let Icon = document.createElement("i")
+      Dive.className = "ImageDiv"
+      Icon.className = "fa-solid fa-heart heart"
+      Image.src = filteredImages[filt]["src"]
+      Dive.appendChild(Image)
+      Dive.appendChild(Icon)
+    MainSection.appendChild(Dive)
+    }
+  }
 })
