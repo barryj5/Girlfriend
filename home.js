@@ -11,15 +11,26 @@ for(let it in File){
   let Img = document.createElement("img")
   let Div = document.createElement("div")
   let I = document.createElement("i")
+  let Trash = document.createElement("i")
   Div.className = "ImageDiv"
   I.className = "fa-solid fa-heart heart"
+  Trash.className = "fa-solid fa-trash"
   Img.src = File[it]["src"]
   Div.appendChild(Img)
   Div.appendChild(I)
+  Div.appendChild(Trash)
   MainSection.appendChild(Div)
 
   if (savedImage.some(image => image.id === File[it].id)) {
     I.classList.add("saved")
+  }
+  Trash.onclick = function(){
+    const remove = confirm("Delete this image?")
+    if(remove === true){
+      Div.remove()
+      File = File.filter(itemz=> itemz.id !== File[it].id)
+      localStorage.setItem("Item",JSON.stringify(File))
+    }
   }
 
   I.onclick = function(){
@@ -47,31 +58,58 @@ imageInput.addEventListener("change",function(){
     let div = document.createElement("div")
     let img = document.createElement("img")
     let i = document.createElement("i")
+    let trash  = document.createElement("i")
+    const canvas = document.createElement("canvas")
     div.className = "ImageDiv"
     i.className = "fa-solid fa-heart heart"
+    trash.className =  "fa-solid fa-trash" 
     div.appendChild(img)
     div.appendChild(i)
-    img.src = e.target.result
-    MainSection.appendChild(div)
+    div.appendChild(trash)
+    const tempImg = new Image()
+    tempImg.src = e.target.result
 
-    let captionText = prompt("Add a caption for this image:") 
-    if(captionText === null){
-      captionText = "Untitled"
-    }
+    tempImg.onload = function(){
+      const scaleFactor = 1000 / tempImg.width
+      const newWidth = 1000
+      const newHeight = tempImg.height * scaleFactor
+      canvas.width = newWidth
+      canvas.height = newHeight
+      const ctx = canvas.getContext("2d")
+      ctx.drawImage(tempImg, 0, 0, canvas.width, canvas.height)
+      const compressed = canvas.toDataURL("image/jpeg", 0.7)
 
-    const newImage = {id: Date.now(), src: e.target.result, caption: captionText}
-    File.push(newImage)
+      img.src = compressed
+      MainSection.appendChild(div)
 
-    i.onclick = function(){
-      const isSaved = i.classList.toggle("saved");
-      if(isSaved){
-        savedImage.push(newImage)
-      }else{
-        savedImage = savedImage.filter(Images => Images.id !== newImage["id"])
+      let captionText = prompt("Add a caption for this image:") 
+      if(captionText === null){
+        captionText = "Untitled"
       }
-      localStorage.setItem("Items",JSON.stringify(savedImage))
+
+      const newImage = {id: Date.now(), src: compressed, caption: captionText}
+      File.push(newImage)
+
+      trash.onclick = function(){
+        const remove = confirm("Delete this image?")
+        if(remove === true){
+          div.remove()
+          File = File.filter(itemz=> itemz.id !== newImage.id)
+          localStorage.setItem("Item",JSON.stringify(File))
+        }
+      }
+
+      i.onclick = function(){
+        const isSaved = i.classList.toggle("saved");
+        if(isSaved){
+          savedImage.push(newImage)
+        }else{
+          savedImage = savedImage.filter(Images => Images.id !== newImage["id"])
+        }
+        localStorage.setItem("Items",JSON.stringify(savedImage))
+      }
+      localStorage.setItem("Item",JSON.stringify(File))
     }
-    localStorage.setItem("Item",JSON.stringify(File))
   }
   reader.readAsDataURL(file)
 
