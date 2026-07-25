@@ -2,6 +2,8 @@ const HomePage = document.getElementById("HomePage")
 const MainSection = document.querySelector(".imageGrid")
 const searchInput = document.querySelector(".homeInput")
 const AddButton = document.getElementById("AddButton")
+const overlay = document.getElementById("overlay")
+const overlayImg = document.getElementById("overlayImg")
 
 HomePage.onclick = function(){
   window.location.href = "home.html"
@@ -14,11 +16,14 @@ for(let it in savedImage){
   let Img = document.createElement("img")
   let Div = document.createElement("div")
   let I = document.createElement("i")
+  let Trash = document.createElement("i")
   Div.className = "ImageDiv"
   I.className = "fa-solid fa-heart heart"
+  Trash.className = "fa-solid fa-trash"
   Img.src = savedImage[it]["src"]
   Div.appendChild(Img)
   Div.appendChild(I)
+  Div.appendChild(Trash)
   MainSection.appendChild(Div)
 
 
@@ -30,12 +35,31 @@ for(let it in savedImage){
     savedImage = savedImage.filter(Image => Image.id !== thisId)
     localStorage.setItem("Items",JSON.stringify(savedImage))
   }
+  Img.onclick = function(){
+    overlayImg.src = Img.src
+    overlay.classList.add("active")
+  }
+  Trash.onclick = function(){
+    const remove = confirm("Delete this image?")
+    if(remove === true){
+      Div.remove()
+      savedImage = savedImage.filter(itemz => itemz.id !== thisId)
+      localStorage.setItem("Items",JSON.stringify(savedImage))
+    }
+  }
+}
+overlay.onclick = function(){
+  overlay.classList.remove("active")
 }
 searchInput.addEventListener("keydown",function(e){
   if(e.key === "Enter"){
     const inputted = searchInput.value.toLowerCase();
     const filteredImages = savedImage.filter(image => image.caption && image.caption.toLowerCase().includes(inputted))
-    MainSection.innerHTML = ""
+    if(filteredImages.length === 0){
+      MainSection.innerHTML = "No results found"
+    }else{
+      MainSection.innerHTML = ""
+    }
     for(let filt in filteredImages){
       let Image = document.createElement("img")
       let Dive = document.createElement("div")
@@ -46,6 +70,10 @@ searchInput.addEventListener("keydown",function(e){
       Dive.appendChild(Image)
       Dive.appendChild(Icon)
     MainSection.appendChild(Dive)
+    Image.onclick = function(){
+      overlayImg.src = Image.src
+      overlay.classList.add("active")
+    }
     }
   }
 })

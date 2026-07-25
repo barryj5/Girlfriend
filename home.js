@@ -3,6 +3,8 @@ const AddButton = document.getElementById("AddButton")
 const MainSection = document.querySelector(".imageGrid")
 const SavedPage = document.getElementById("SavedPage")
 const searchInput = document.querySelector(".homeInput")
+const overlay = document.getElementById("overlay")
+const overlayImg = document.getElementById("overlayImg")
 
 let savedImage = JSON.parse(localStorage.getItem("Items"))||[];
 
@@ -42,6 +44,13 @@ for(let it in File){
     }
     localStorage.setItem("Items",JSON.stringify(savedImage))
   }
+  Img.onclick = function(){
+    overlayImg.src = Img.src
+    overlay.classList.add("active")
+  }
+}
+overlay.onclick = function(){
+  overlay.classList.remove("active")
 }
 AddButton.onclick = function(){
   imageInput.click()
@@ -99,6 +108,11 @@ imageInput.addEventListener("change",function(){
         }
       }
 
+      img.onclick = function(){
+        overlayImg.src = img.src
+        overlay.classList.add("active")
+      }
+
       i.onclick = function(){
         const isSaved = i.classList.toggle("saved");
         if(isSaved){
@@ -118,7 +132,11 @@ searchInput.addEventListener("keydown",function(e){
   if(e.key === "Enter"){
     const inputted = searchInput.value.toLowerCase();
     const filteredImages = File.filter(image => image.caption && image.caption.toLowerCase().includes(inputted))
-    MainSection.innerHTML = ""
+    if(filteredImages.length === 0){
+      MainSection.innerHTML = "No results found"
+    }else{
+      MainSection.innerHTML = ""
+    }
     for(let filt in filteredImages){
       let Image = document.createElement("img")
       let Dive = document.createElement("div")
@@ -129,6 +147,10 @@ searchInput.addEventListener("keydown",function(e){
       Dive.appendChild(Image)
       Dive.appendChild(Icon)
     MainSection.appendChild(Dive)
+    Image.onclick = function(){
+      overlayImg.src = Image.src
+      overlay.classList.add("active")
+    }
     }
   }
 })
